@@ -1,8 +1,10 @@
-'use client'
+// Marcar este componente como um Client Component
+"use client";
 
 // import node module libraries
 import { Row, Col, Card, Form, Button, Image } from 'react-bootstrap';
 import Link from 'next/link';
+import { FaGoogle, FaFacebook } from 'react-icons/fa';
 
 // import hooks
 import useMounted from 'hooks/useMounted';
@@ -58,7 +60,15 @@ const SignIn = () => {
                 </div>
               </Form>}
 
-
+            {/* Social Login Buttons */}
+            <div className="d-grid gap-2 mt-4">
+              <Button variant="danger" href="/authentication/login-google" className="d-flex align-items-center justify-content-center">
+                <FaGoogle className="me-2" /> Login com Google
+              </Button>
+              <Button variant="primary" href="/authentication/login-facebook" className="d-flex align-items-center justify-content-center">
+                <FaFacebook className="me-2" /> Login com Facebook
+              </Button>
+            </div>
           </Card.Body>
         </Card>
       </Col>
@@ -66,5 +76,4 @@ const SignIn = () => {
   )
 }
 
-
-export default SignIn
+export default SignIn;

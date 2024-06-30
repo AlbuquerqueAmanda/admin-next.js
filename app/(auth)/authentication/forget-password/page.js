@@ -18,21 +18,21 @@ const ForgetPassword = () => {
           <Card.Body className="p-6">
             <div className="mb-4">
               <Link href="/"><Image src="/images/brand/logo/logo-primary.svg" className="mb-2" alt="" /></Link>
-              <p className="mb-6">Don&apos;t worry, we&apos;ll send you an email to reset your password.</p>
+              <p className="mb-6">Enviaremos um e-mail para alterar sua senha.</p>
             </div>
             {/* Form */}
             {hasMounted && 
             <Form>
               {/* Email */}
               <Form.Group className="mb-3" controlId="email">
-                <Form.Label>Email</Form.Label>
-                <Form.Control type="email" name="email" placeholder="Enter Your Email" />
+                <Form.Label>E-mail</Form.Label>
+                <Form.Control type="email" name="email" placeholder="Insira seu e-mail de cadastro" />
               </Form.Group>
               {/* Button */}
               <div className="mb-3 d-grid">
-                <Button variant="primary" type="submit">Reset Password</Button>
+                <Button variant="primary" type="submit">Redefinir minha senha</Button>
               </div>
-              <span>Don&apos;t have an account? <Link href="/authentication/sign-in">Sign In</Link></span>
+              <span>Não possui conta? <Link href="/authentication/sign-in">Criar conta</Link></span>
             </Form>
             }
           </Card.Body>
