@@ -1,32 +1,65 @@
 // import node module libraries
 import Link from 'next/link';
-import { Col, Row, Card } from 'react-bootstrap';
+import { useState } from 'react';
+import { Col, Row, Card, Modal, Button } from 'react-bootstrap';
 
 const DeleteAccount = () => {
-  return (
-    <Row>
-      <Col xl={3} lg={4} md={12} xs={12}>
-        <div className="mb-4 mb-lg-0">
-          <h4 className="mb-1">Delete Account</h4>
-          <p className="mb-0 fs-5 text-muted">Easily set up social media accounts</p>
-        </div>
-      </Col>
-      <Col xl={9} lg={8} md={12} xs={12}>
-        <Card className="mb-6">
-          <Card.Body>
-            <div className="mb-6">
-              <h4 className="mb-1">Danger Zone </h4>
-            </div>
-            <div>
-              <p>Delete any and all content you have, such as articles, comments, your reading list or chat messages. Allow your username to become available to anyone.</p>
-              <Link href="#" className="btn btn-danger">Delete Account</Link>
-              <p className="small mb-0 mt-3">Feel free to contact with any <Link href="#">dashui@example.com</Link> questions.</p>
-            </div>
-          </Card.Body>
-        </Card>
-      </Col>
-    </Row>
-  )
-}
+  const [showModal, setShowModal] = useState(false);
 
-export default DeleteAccount
+  const handleDelete = () => {
+    setShowModal(true);
+  };
+
+  const confirmDelete = () => {
+    setShowModal(false);
+    // Aqui você pode adicionar a lógica para deletar a conta
+    console.log('Conta deletada.');
+  };
+
+  const cancelDelete = () => {
+    setShowModal(false);
+  };
+
+  return (
+    <>
+      <Row>
+        <Col xl={3} lg={4} md={12} xs={12}>
+          <div className="mb-4 mb-lg-0">
+            <h4 className="mb-1">Deletar Conta</h4>
+            <p className="mb-0 fs-5 text-muted">Excluir definitivamente sua conta</p>
+          </div>
+        </Col>
+        <Col xl={9} lg={8} md={12} xs={12}>
+          <Card className="mb-6">
+            <Card.Body>
+              <div className="mb-6">
+                <h4 className="mb-1">Atenção! Essa ação é definitiva. </h4>
+              </div>
+              <div>
+                <p>Exclua permanentemente todo o seu conteúdo, incluindo artigos, comentários, lista de leitura e mensagens de chat. Seu nome de usuário ficará disponível para qualquer pessoa.</p>
+                <Button className="btn btn-danger" onClick={handleDelete}>Deletar Conta</Button>
+              </div>
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
+
+      <Modal show={showModal} onHide={cancelDelete}>
+        <Modal.Header closeButton>
+          <Modal.Title>Confirmar Exclusão</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>Você tem certeza de que deseja deletar sua conta? Esta ação não pode ser desfeita.</Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={cancelDelete}>
+            Cancelar
+          </Button>
+          <Button variant="danger" onClick={confirmDelete}>
+            Deletar Conta
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    </>
+  );
+};
+
+export default DeleteAccount;

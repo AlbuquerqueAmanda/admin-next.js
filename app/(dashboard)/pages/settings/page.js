@@ -9,11 +9,11 @@ import { PageHeading } from 'widgets'
 import { Notifications, DeleteAccount, GeneralSetting, EmailSetting, Preferences } from 'sub-components'
 
 const Settings = () => {
-  return (
+  return ( 
     <Container fluid className="p-6">
 
       {/* Page Heading */}
-      <PageHeading heading="General" />
+      <PageHeading heading="Configurações" />
 
       {/* General Settings */}
       <GeneralSetting />

@@ -13,19 +13,15 @@ const NotFound = () => {
     <Fragment>
       {hasMounted &&
         <Container>
-          <Row >
-            <Col sm={12}>
-              <div className="text-center">
-                <div className="mb-3">
-                  <Image src="/images/error/404-error-img.png" alt="" className="img-fluid" />
-                </div>
-                <h1 className="display-4 fw-bold">Oops! the page not found.</h1>
-                <p className="mb-4">Or simply leverage the expertise of our consultation
-                  team.</p>
-                <Link href="/" className="btn btn-primary">
-                  Go Home
-                </Link>
-              </div>
+          <Row className="justify-content-center align-items-center min-vh-100">
+            <Col sm={12} className="text-center">
+              <h1 className="display-4 fw-bold text-danger">Oops! Página não encontrada.</h1>
+              <p className="mb-4 text-muted">Desculpe, mas a página que você está procurando não existe ou foi movida.</p>
+              <Link legacyBehavior href="/" passHref>
+                <a className="btn btn-primary btn-lg">
+                  Voltar para a Página Inicial
+                </a>
+              </Link>
             </Col>
           </Row>
         </Container>
@@ -34,7 +30,4 @@ const NotFound = () => {
   );
 };
 
-
 export default NotFound;
-
-

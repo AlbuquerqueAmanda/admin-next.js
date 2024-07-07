@@ -32,19 +32,14 @@ export const DashboardMenu = [
 	},
 	{
 		id: uuid(),
-		title: 'LAYOUTS & PAGES',
-		grouptitle: true
-	},
-	{
-		id: uuid(),
 		title: 'Pages',
 		icon: 'layers',
 		children: [
-			{ id: uuid(), link: '/pages/profile', name: 'Clientes' },
+			{ id: uuid(), link: '/pages/clientes', name: 'Clientes' },
 			{ id: uuid(), link: '/pages/relatorios', name: 'Relatórios'},
-			{ id: uuid(), link: '/pages/billing', name: 'Recursos' },
-			{ id: uuid(), link: '/pages/pricing', name: 'Gráficos'},
-			{ id: uuid(), link: '/not-found', name: 'Coordenação' }
+			{ id: uuid(), link: '/pages/recursos', name: 'Recursos' },
+			{ id: uuid(), link: '/pages/graficos', name: 'Gráficos'},
+			{ id: uuid(), link: '/not-found', name: 'Not found' }
 		]
 	},	
 	{
@@ -62,12 +57,7 @@ export const DashboardMenu = [
 		title: 'Layouts',
 		icon: 'layout',
 		link: '/layout-vertical'
-	},	
-	{
-		id: uuid(),
-		title: 'UI COMPONENTS',
-		grouptitle: true
-	},	
+	},		
 	{
 		id: uuid(),
 		title: 'Components',
@@ -134,11 +124,6 @@ export const DashboardMenu = [
 	},	
 	{
 		id: uuid(),
-		title: 'Documentation',
-		grouptitle: true
-	},
-	{
-		id: uuid(),
 		title: 'Docs',
 		icon: 'clipboard',
 		link: '/documentation'
@@ -149,12 +134,6 @@ export const DashboardMenu = [
 		icon: 'git-pull-request',
 		link: '/changelog'
 	},
-	{
-		id: uuid(),
-		title: 'Download',
-		icon: 'download',
-		link: 'https://codescandy.gumroad.com/l/dashui-nextjs'
-	}
 ];
 
 export default DashboardMenu;

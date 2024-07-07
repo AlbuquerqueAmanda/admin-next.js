@@ -64,10 +64,10 @@ const SignUp = () => {
                 </div>
                 <div className="d-md-flex justify-content-between mt-4">
                   <div className="mb-2 mb-md-0">
-                    <Link href="/authentication/sign-in" className="fs-5">Already member? Login </Link>
+                    <Link href="/authentication/sign-in" className="fs-5">Já possui conta? Faça Login. </Link>
                   </div>
                   <div>
-                    <Link href="/authentication/forget-password" className="text-inherit fs-5">Forgot your password?</Link>
+                    <Link href="/authentication/forget-password" className="text-inherit fs-5">Esqueceu sua senha?</Link>
                   </div>
                 </div>
               </div>
@@ -80,4 +80,4 @@ const SignUp = () => {
   )
 }
 
-export default SignUp
+export default SignUp;

@@ -7,7 +7,6 @@ import { useMediaQuery } from 'react-responsive';
 import {
 	ListGroup,
 	Card,
-	Image,
 	Badge,
 } from 'react-bootstrap';
 import Accordion from 'react-bootstrap/Accordion';
@@ -97,11 +96,7 @@ const NavbarVertical = (props) => {
 	return (
 		<Fragment>
 			<SimpleBar style={{ maxHeight: '100vh' }}>
-				<div className="nav-scroller">
-					<Link href="/" className="navbar-brand">
-						<Image src="/images/brand/logo/logo.svg" alt="" />
-					</Link>
-				</div>				
+							
 				{/* Dashboard Menu */}
 				<Accordion defaultActiveKey="0" as="ul" className="navbar-nav flex-column">
 					{DashboardMenu.map(function (menu, index) {

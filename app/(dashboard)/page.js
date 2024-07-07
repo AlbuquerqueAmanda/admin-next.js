@@ -1,6 +1,7 @@
 'use client'
 // import node module libraries
-import { Col, Row, Container, Card } from 'react-bootstrap';
+import { Col, Row, Container, Card, Button } from 'react-bootstrap';
+import Link from 'next/link';
 
 // import widget as custom components
 import { PageHeading } from 'widgets'
@@ -12,6 +13,11 @@ const Home = () => {
         <Col>
           {/* Page Heading */}
           <PageHeading heading="Página Inicial" />
+        </Col>
+        <Col className="text-end">
+          <Link href="/authentication/sign-in" passHref>
+            <Button variant="primary">Login</Button>
+          </Link>
         </Col>
       </Row>
 
