@@ -32,6 +32,11 @@ const ResourceManagement = () => {
   };
 
   const handleAddResource = () => {
+    if (!resourceName || !resourceType || !resourceQuantity) {
+      alert('Por favor, preencha todos os campos antes de adicionar um recurso.');
+      return;
+    }
+
     const newResource = {
       name: resourceName,
       type: resourceType,
@@ -125,7 +130,6 @@ const ResourceManagement = () => {
               onChange={(e) => setResourceType(e.target.value)}
             >
               <option value="">Selecione o tipo de recurso</option>
-              <option value="Humano">Humano</option>
               <option value="Financeiro">Financeiro</option>
               <option value="Material">Material</option>
             </Form.Control>

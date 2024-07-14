@@ -1,169 +1,319 @@
-// pages/relatorios/page.js
 'use client';
-// pages/relatorios/page.js
-
-import { useState } from 'react';
-import { Container, Row, Col, Card, Button, ListGroup, Modal, Form } from 'react-bootstrap';
+import { useState, useEffect } from 'react';
+import { Container, Row, Col, Card, Button, ListGroup, Modal, Form, Alert } from 'react-bootstrap';
 import jsPDF from 'jspdf';
-
-// Dados fictícios de clientes com data de modificação
-const clientes = [
-  { id: 1, nome: 'João Silva', dataNascimento: '15/02/1985', cidade: 'São Paulo', telefone: '(11) 9999-9999', email: 'joao.silva@example.com', dataModificacao: '2023-06-15' },
-  { id: 2, nome: 'Maria Souza', dataNascimento: '23/07/1990', cidade: 'Rio de Janeiro', telefone: '(21) 8888-8888', email: 'maria.souza@example.com', dataModificacao: '2023-05-20' },
-  { id: 3, nome: 'José Santos', dataNascimento: '10/04/1982', cidade: 'Belo Horizonte', telefone: '(31) 7777-7777', email: 'jose.santos@example.com', dataModificacao: '2023-07-02' },
-  { id: 4, nome: 'Ana Oliveira', dataNascimento: '05/09/1995', cidade: 'Porto Alegre', telefone: '(51) 6666-6666', email: 'ana.oliveira@example.com', dataModificacao: '2023-04-18' },
-  { id: 5, nome: 'Enzo Costa', dataNascimento: '12/11/1988', cidade: 'Brasília', telefone: '(61) 5555-5555', email: 'enzo.costa@example.com', dataModificacao: '2023-08-10' },
-  { id: 6, nome: 'Mariana Lima', dataNascimento: '20/03/1993', cidade: 'Salvador', telefone: '(71) 4444-4444', email: 'mariana.lima@example.com', dataModificacao: '2023-09-05' },
-  { id: 7, nome: 'Rafael Mendes', dataNascimento: '28/06/1980', cidade: 'Curitiba', telefone: '(41) 3333-3333', email: 'rafael.mendes@example.com', dataModificacao: '2023-07-20' },
-  { id: 8, nome: 'Carla Almeida', dataNascimento: '14/07/1991', cidade: 'Fortaleza', telefone: '(85) 2222-2222', email: 'carla.almeida@example.com', dataModificacao: '2023-05-28' },
-  { id: 9, nome: 'Lucas Santos', dataNascimento: '08/05/1987', cidade: 'Manaus', telefone: '(92) 1111-1111', email: 'lucas.santos@example.com', dataModificacao: '2023-06-30' },
-  { id: 10, nome: 'Fernanda Oliveira', dataNascimento: '17/12/1984', cidade: 'Recife', telefone: '(81) 0000-0000', email: 'fernanda.oliveira@example.com', dataModificacao: '2023-08-15' },
-];
+import 'jspdf-autotable';
 
 const Relatorios = () => {
-  // Estado para controlar exibição dos detalhes do cliente
+  const [relatorios, setRelatorios] = useState([]);
+  const [formData, setFormData] = useState({ tipo: '', conteudo: '', setor: '', titulo: '' });
+  const [showForm, setShowForm] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
+  const [relatoriosSelecionados, setRelatoriosSelecionados] = useState([]);
+  const [filtroTipo, setFiltroTipo] = useState('');
+  const [ordem, setOrdem] = useState('');
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
-  // Estado para armazenar o cliente selecionado para visualização detalhada
-  const [selectedCliente, setSelectedCliente] = useState(null);
-  // Estado para o filtro por nome
-  const [filtroNome, setFiltroNome] = useState('');
-  // Estado para o filtro por cidade
-  const [filtroCidade, setFiltroCidade] = useState('');
-  // Estado para a opção de ordenação
-  const [ordenacao, setOrdenacao] = useState('');
+  const [selectedRelatorio, setSelectedRelatorio] = useState(null);
 
-  // Função para exibir os detalhes do cliente
-  const handleViewDetails = (cliente) => {
-    setSelectedCliente(cliente);
+  useEffect(() => {
+    const relatoriosLocalStorage = JSON.parse(localStorage.getItem('relatorios')) || [];
+    if (!Array.isArray(relatoriosLocalStorage)) {
+      localStorage.setItem('relatorios', JSON.stringify([]));
+      setRelatorios([]);
+    } else {
+      setRelatorios(relatoriosLocalStorage);
+    }
+  }, []);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const handleCadastroRelatorio = () => {
+    if (!formData.tipo || !formData.conteudo) {
+      setShowAlert(true);
+      return;
+    }
+    const newRelatorio = {
+      id: relatorios.length + 1,
+      ...formData,
+      dataModificacao: new Date().toLocaleDateString('pt-BR'),
+    };
+    const updatedRelatorios = [...relatorios, newRelatorio];
+    setRelatorios(updatedRelatorios);
+    localStorage.setItem('relatorios', JSON.stringify(updatedRelatorios));
+    setFormData({ tipo: '', conteudo: '', setor: '', titulo: '' });
+    setShowAlert(false);
+    setShowForm(false);
+  };
+
+  const handleShowForm = () => setShowForm(true);
+  const handleCloseForm = () => setShowForm(false);
+
+  const handleExportarPDF = (relatoriosToExport) => {
+    const doc = new jsPDF();
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'bold'); // Define o estilo da fonte como negrito
+  
+    let startY = 10; // Posição inicial do primeiro relatório na página
+    let pageHeight = doc.internal.pageSize.height; // Altura da página atual (padrão A4)
+    let marginBottom = 10;
+  
+    relatoriosToExport.forEach((relatorio, index) => {
+      // Calcula a altura necessária para renderizar o relatório completo
+      let lineHeight = 5; // Altura estimada de uma linha de texto
+      let relatorioHeight = 60; // Altura base do relatório
+  
+      if (relatorio.conteudo) {
+        relatorioHeight += relatorio.conteudo.split('\n').length * lineHeight; // Altura estimada do conteúdo do relatório
+      }
+  
+      // Verifica se há espaço suficiente para renderizar o relatório na página atual
+      if (startY + relatorioHeight > pageHeight - marginBottom) {
+        if (index > 0) { // Evita adicionar uma página antes do primeiro relatório
+          doc.addPage(); // Adiciona uma nova página se não houver espaço suficiente
+        }
+        startY = 10; // Reinicia a posição Y para o topo da nova página
+      }
+  
+      // Escreve o relatório na posição startY
+      doc.setFont('helvetica', 'bold'); // Garante que o estilo da fonte seja negrito para o título do relatório
+      doc.text(`Relatório ${index + 1}`, 10, startY);
+      startY += 10; // Ajusta a posição Y para o próximo elemento
+  
+      doc.setFont('helvetica', 'normal'); // Retorna ao estilo de fonte normal para os detalhes do relatório
+      doc.text(`Tipo: ${relatorio.tipo}`, 15, startY);
+      startY += 10;
+      doc.text(`Setor: ${relatorio.setor}`, 15, startY);
+      startY += 10;
+      doc.text(`Título: ${relatorio.titulo}`, 15, startY);
+      startY += 10;
+      doc.text(`Conteúdo:`, 15, startY);
+      doc.setFont('helvetica', 'normal');
+      startY += 5;
+  
+      if (relatorio.conteudo) {
+        const lines = doc.splitTextToSize(relatorio.conteudo, 180); // Ajusta o conteúdo para caber na largura da página
+        lines.forEach((line) => {
+          if (startY > pageHeight - marginBottom) {
+            doc.addPage();
+            startY = 10;
+          }
+          doc.text(line, 15, startY);
+          startY += lineHeight;
+        });
+      }
+  
+      startY += 10; // Ajusta a posição Y para a próxima seção
+      if (startY > pageHeight - marginBottom) {
+        doc.addPage();
+        startY = 10;
+      }
+      doc.text(`Data de Modificação: ${relatorio.dataModificacao}`, 15, startY);
+      startY += 20; // Ajusta a posição Y para a próxima seção
+    });
+  
+    doc.save('lista_relatorios.pdf');
+  };
+   
+  const handleCloseAlert = () => setShowAlert(false);
+
+  const handleShowConfirmModal = () => setShowConfirmModal(true);
+  const handleCloseConfirmModal = () => setShowConfirmModal(false);
+
+  const handleExcluirRelatoriosSelecionados = () => {
+    const updatedRelatorios = relatorios.filter((relatorio) => !relatoriosSelecionados.includes(relatorio.id));
+    setRelatorios(updatedRelatorios);
+    localStorage.setItem('relatorios', JSON.stringify(updatedRelatorios));
+    setShowConfirmModal(false);
+    setRelatoriosSelecionados([]);
+  };
+
+  const handleViewDetails = (relatorio) => {
+    setSelectedRelatorio(relatorio);
     setShowDetails(true);
   };
 
-  // Função para fechar o modal de detalhes do cliente
-  const handleCloseDetails = () => {
-    setShowDetails(false);
-  };
+  const handleCloseDetails = () => setShowDetails(false);
 
-  // Função para capturar e exportar os dados do cliente como PDF
-  const handleSavePDF = () => {
-    const doc = new jsPDF();
-
-    try {
-      const { nome, dataNascimento, cidade, telefone, email } = selectedCliente;
-      doc.text(`Nome: ${nome}`, 10, 20);
-      doc.text(`Data de Nascimento: ${dataNascimento}`, 10, 30);
-      doc.text(`Cidade: ${cidade}`, 10, 40);
-      doc.text(`Telefone: ${telefone}`, 10, 50);
-      doc.text(`Email: ${email}`, 10, 60);
-
-      // Adiciona a data de modificação no PDF
-      if (selectedCliente.dataModificacao) {
-        doc.text(`Data de Modificação: ${selectedCliente.dataModificacao}`, 10, 70);
-      }
-
-      // Salva o PDF com o nome do cliente
-      doc.save(`dados_cliente_${nome}.pdf`);
-    } catch (error) {
-      console.error('Erro ao gerar PDF:', error);
+  const handleSelectRelatorio = (id) => {
+    const selecionados = [...relatoriosSelecionados];
+    if (selecionados.includes(id)) {
+      setRelatoriosSelecionados(selecionados.filter((selectedId) => selectedId !== id));
+    } else {
+      setRelatoriosSelecionados([...selecionados, id]);
     }
   };
 
-  // Função para aplicar filtros e ordenação nos clientes
-  const filteredAndSortedClientes = clientes.filter(cliente => {
-    return (
-      (cliente.nome.toLowerCase().includes(filtroNome.toLowerCase()) || filtroNome === '') &&
-      (cliente.cidade.toLowerCase().includes(filtroCidade.toLowerCase()) || filtroCidade === '')
-    );
-  }).sort((a, b) => {
-    // Ordenação por nome
-    if (ordenacao === 'nome') {
-      return a.nome.localeCompare(b.nome);
-    }
-    // Ordenação por data de modificação
-    if (ordenacao === 'dataModificacao') {
-      return new Date(b.dataModificacao) - new Date(a.dataModificacao);
-    }
+  const handleExportar = () => {
+    const relatoriosToExport = relatoriosSelecionados.length
+      ? relatorios.filter((relatorio) => relatoriosSelecionados.includes(relatorio.id))
+      : relatorios;
+    handleExportarPDF(relatoriosToExport);
+  };
 
-    return 0;
-  });
+  const handleSelectAll = () => {
+    if (relatoriosSelecionados.length === relatorios.length) {
+      setRelatoriosSelecionados([]);
+    } else {
+      setRelatoriosSelecionados(relatorios.map((relatorio) => relatorio.id));
+    }
+  };
+
+  const filtrarRelatorios = () => {
+    return relatorios
+      .filter((relatorio) => relatorio.tipo.toLowerCase().includes(filtroTipo.toLowerCase()))
+      .sort((a, b) => {
+        if (ordem === 'tipo') {
+          return a.tipo.localeCompare(b.tipo);
+        } else if (ordem === 'dataModificacao') {
+          return new Date(b.dataModificacao) - new Date(a.dataModificacao);
+        }
+        return 0;
+      });
+  };
+
+  const relatoriosFiltrados = filtrarRelatorios();
 
   return (
-    <Container fluid className="p-6 d-flex justify-content-center align-items-center" style={{ minHeight: '100vh' }}>
-      <Row className="w-100">
-        <Col>
-          <Card className="shadow">
-            <Card.Body>
-              {/* Filtros e controles */}
-              <Form className="mb-3">
-                <Row>
-                  <Col md={4}>
-                    <Form.Control
-                      type="text"
-                      placeholder="Filtrar por nome"
-                      value={filtroNome}
-                      onChange={(e) => setFiltroNome(e.target.value)}
-                    />
-                  </Col>
-                  <Col md={4}>
-                    <Form.Control
-                      type="text"
-                      placeholder="Filtrar por cidade"
-                      value={filtroCidade}
-                      onChange={(e) => setFiltroCidade(e.target.value)}
-                    />
-                  </Col>
-                  <Col md={4}>
-                    <Form.Select
-                      value={ordenacao}
-                      onChange={(e) => setOrdenacao(e.target.value)}
-                    >
-                      <option value="">Ordenar por...</option>
-                      <option value="nome">Nome</option>
-                      <option value="dataModificacao">Data de Modificação</option>
-                    </Form.Select>
-                  </Col>
-                </Row>
-              </Form>
-
-              {/* Lista de clientes filtrada e ordenada */}
-              <ListGroup>
-                {filteredAndSortedClientes.map(cliente => (
-                  <ListGroup.Item key={cliente.id} className="d-flex justify-content-between align-items-center">
-                    <span>{cliente.nome}</span>
-                    <span>{cliente.cidade}</span>
-                    <span>Data de Modificação: {cliente.dataModificacao}</span>
-                    <Button variant="outline-secondary" onClick={() => handleViewDetails(cliente)}>Visualizar</Button>
-                  </ListGroup.Item>
-                ))}
-              </ListGroup>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
-
-      {/* Modal para exibir detalhes do cliente */}
-      <Modal show={showDetails} onHide={handleCloseDetails}>
-        <Modal.Header closeButton>
-          <Modal.Title>Detalhes do Cliente</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          {selectedCliente && (
-            <div>
-              <p><strong>Nome:</strong> {selectedCliente.nome}</p>
-              <p><strong>Data de Nascimento:</strong> {selectedCliente.dataNascimento}</p>
-              <p><strong>Cidade:</strong> {selectedCliente.cidade}</p>
-              <p><strong>Telefone:</strong> {selectedCliente.telefone}</p>
-              <p><strong>Email:</strong> {selectedCliente.email}</p>
-              {selectedCliente.dataModificacao && (
-                <p><strong>Data de Modificação:</strong> {selectedCliente.dataModificacao}</p>
-              )}
-            </div>
+    <Container>
+      <Card className="mt-4">
+        <Card.Header>Cadastro de Relatórios</Card.Header>
+        <Card.Body>
+          <Row className="mb-4">
+            <Col md={6}>
+              <Form.Control
+                type="text"
+                placeholder="Filtrar por tipo"
+                value={filtroTipo}
+                onChange={(e) => setFiltroTipo(e.target.value)}
+              />
+            </Col>
+            <Col md={6}>
+              <Form.Select value={ordem} onChange={(e) => setOrdem(e.target.value)}>
+                <option value="">Ordenar por</option>
+                <option value="tipo">Tipo</option>
+                <option value="dataModificacao">Data de Modificação</option>
+              </Form.Select>
+            </Col>
+          </Row>
+          <Button onClick={handleShowForm} className="mb-4">Cadastrar Novo Relatório</Button>
+          <Button onClick={handleExportar} className="mb-4 ms-2">Exportar PDF</Button>
+          <Button onClick={handleSelectAll} className="mb-4 ms-2">
+            {relatoriosSelecionados.length === relatorios.length ? "Deselecionar Tudo" : "Selecionar Tudo"}
+          </Button>
+          {relatoriosSelecionados.length > 0 && (
+            <Button onClick={handleShowConfirmModal} variant="danger" className="mb-4 ms-2">Excluir Selecionados</Button>
           )}
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleCloseDetails}>Fechar</Button>
-          <Button variant="primary" onClick={handleSavePDF}>Salvar como PDF</Button>
-        </Modal.Footer>
-      </Modal>
+          <ListGroup>
+            {relatoriosFiltrados.map((relatorio) => (
+              <ListGroup.Item key={relatorio.id} className="d-flex justify-content-between align-items-center">
+                <div>
+                  <input
+                    type="checkbox"
+                    onChange={() => handleSelectRelatorio(relatorio.id)}
+                    checked={relatoriosSelecionados.includes(relatorio.id)}
+                  />
+                  <span className="ms-2">{relatorio.tipo} - {relatorio.dataModificacao}</span>
+                </div>
+                <div>
+                  <Button onClick={() => handleViewDetails(relatorio)} variant="info" size="sm" className="me-2">Detalhes</Button>
+                </div>
+              </ListGroup.Item>
+            ))}
+          </ListGroup>
+          <Modal show={showForm} onHide={handleCloseForm}>
+            <Modal.Header closeButton>
+              <Modal.Title>Cadastro de Relatório</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <Form>
+                {showAlert && <Alert variant="danger" onClose={handleCloseAlert} dismissible>Por favor, preencha todos os campos.</Alert>}
+                <Form.Group>
+                  <Form.Label>Tipo</Form.Label>
+                  <Form.Control
+                    type="text"
+                    placeholder="Digite o tipo do relatório"
+                    name="tipo"
+                    value={formData.tipo}
+                    onChange={handleChange}
+                    required
+                  />
+                </Form.Group>
+                <Form.Group>
+                  <Form.Label>Setor</Form.Label>
+                  <Form.Control
+                    type="text"
+                    placeholder="Digite o setor do relatório"
+                    name="setor"
+                    value={formData.setor}
+                    onChange={handleChange}
+                  />
+                </Form.Group>
+                <Form.Group>
+                  <Form.Label>Título</Form.Label>
+                  <Form.Control
+                    type="text"
+                    placeholder="Digite o título do relatório"
+                    name="titulo"
+                    value={formData.titulo}
+                    onChange={handleChange}
+                  />
+                </Form.Group>
+                <Form.Group>
+                  <Form.Label>Conteúdo</Form.Label>
+                  <Form.Control
+                    as="textarea"
+                    rows={3}
+                    placeholder="Digite o conteúdo do relatório"
+                    name="conteudo"
+                    value={formData.conteudo}
+                    onChange={handleChange}
+                    required
+                  />
+                </Form.Group>
+              </Form>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={handleCloseForm}>Cancelar</Button>
+              <Button variant="primary" onClick={handleCadastroRelatorio}>Salvar</Button>
+            </Modal.Footer>
+          </Modal>
+          <Modal show={showConfirmModal} onHide={handleCloseConfirmModal}>
+            <Modal.Header closeButton>
+              <Modal.Title>Confirmar Exclusão</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              Deseja realmente excluir os relatórios selecionados?
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={handleCloseConfirmModal}>Cancelar</Button>
+              <Button variant="danger" onClick={handleExcluirRelatoriosSelecionados}>Excluir</Button>
+            </Modal.Footer>
+          </Modal>
+          <Modal show={showDetails} onHide={handleCloseDetails}>
+            <Modal.Header closeButton>
+              <Modal.Title>Detalhes do Relatório</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              {selectedRelatorio && (
+                <>
+                  <p><strong>Tipo:</strong> {selectedRelatorio.tipo}</p>
+                  <p><strong>Setor:</strong> {selectedRelatorio.setor}</p>
+                  <p><strong>Título:</strong> {selectedRelatorio.titulo}</p>
+                  <p><strong>Conteúdo:</strong> {selectedRelatorio.conteudo}</p>
+                  <p><strong>Data de Modificação:</strong> {selectedRelatorio.dataModificacao}</p>
+                </>
+              )}
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={handleCloseDetails}>Fechar</Button>
+            </Modal.Footer>
+          </Modal>
+        </Card.Body>
+      </Card>
     </Container>
   );
 };
