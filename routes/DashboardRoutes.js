@@ -39,9 +39,7 @@ export const DashboardMenu = [
 			{ id: uuid(), link: '/pages/relatorios', name: 'Relatórios'},
 			{ id: uuid(), link: '/pages/recursos', name: 'Recursos' },
 			{ id: uuid(), link: '/pages/graficos', name: 'Gráficos'},
-			{ id: uuid(), link: '/not-found', name: 'Not found' },
-			{ id: uuid(), link: '/loading', name: 'Loading' }
-
+			{ id: uuid(), link: '/not-found', name: 'Not found' }
 		]
 	},	
 	{
@@ -126,9 +124,9 @@ export const DashboardMenu = [
 	},	
 	{
 		id: uuid(),
-		title: 'Docs',
+		title: 'Coordenação',
 		icon: 'clipboard',
-		link: '/documentation'
+		link: '/coordenacao'
 	},
 	{
 		id: uuid(),
