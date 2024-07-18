@@ -1,4 +1,4 @@
-// import node module libraries
+'use client';
 import React, { useEffect, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Image } from 'react-bootstrap';
@@ -69,7 +69,7 @@ export const DropFiles = (props) => {
 		<section className="container">
 			<div {...getRootProps({ className: 'dropzone' })}>
 				<input {...getInputProps()} />
-				<p className="text-center">Drag 'n' drop some files here, or click to select files</p>
+				<p className="text-center">Drag and drop some files here, or click to select files</p>
 			</div>
 			<aside style={thumbsContainer}>{thumbs}</aside>
 		</section>

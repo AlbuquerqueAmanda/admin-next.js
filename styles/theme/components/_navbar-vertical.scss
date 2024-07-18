@@ -55,7 +55,7 @@
 
         &.active {
           color: $gray-200;
-
+          margin-top: 25px;
         }
 
         &.active .nav-icon {
@@ -142,11 +142,6 @@
   }
 }
 
-
 .collapse.in {
     display: block;
-
-
-
-
 }
