@@ -32,7 +32,7 @@ const ForgetPassword = () => {
               <div className="mb-3 d-grid">
                 <Button variant="primary" type="submit">Redefinir minha senha</Button>
               </div>
-              <span>Não possui conta? <Link href="/authentication/sign-in">Criar conta</Link></span>
+              <span>Não possui conta? <Link href="/authentication/sign-up">Criar conta</Link></span>
             </Form>
             }
           </Card.Body>

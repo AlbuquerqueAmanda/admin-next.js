@@ -1,14 +1,14 @@
-'use client'
+'use client';
 
 // import node module libraries
+import { useState } from 'react';
 import { Row, Col, Card, Form, Button, Image } from 'react-bootstrap';
 import Link from 'next/link';
-
-// import hooks
 import useMounted from 'hooks/useMounted';
 
 const SignUp = () => {
   const hasMounted = useMounted();
+
   return (
     <Row className="align-items-center justify-content-center g-0 min-vh-100">
       <Col xxl={4} lg={6} md={8} xs={12} className="py-8 py-xl-0">
@@ -16,9 +16,18 @@ const SignUp = () => {
         <Card className="smooth-shadow-md">
           {/* Card body */}
           <Card.Body className="p-6">
-            <div className="mb-4">
-              <Link href="/"><Image src="/images/brand/logo/logo-primary.svg" className="mb-2" alt="" /></Link>
-              <p className="mb-6">Crie sua conta</p>
+            <div className="d-flex justify-content-between mb-4">
+              <div>
+                <Link href="/">
+                  <Image src="/images/brand/logo/logo-primary.svg" className="mb-2" alt="" />
+                </Link>
+                <p className="mb-6">Crie sua conta</p>
+              </div>
+              <div>
+                <Link href="/">
+                  <Button variant="secondary">Página Inicial</Button>
+                </Link>
+              </div>
             </div>
             {/* Form */}
             {hasMounted && 
@@ -77,7 +86,8 @@ const SignUp = () => {
         </Card>
       </Col>
     </Row>
-  )
-}
+  );
+};
 
 export default SignUp;
+  
